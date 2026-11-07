@@ -33,7 +33,7 @@ para aplicar **Integração Contínua (CI)** com GitHub Actions e **Infraestrutu
 
 ## Rodando localmente
 
-Requisito: Node.js 20 ou superior.
+Requisito: Node.js 22 ou superior.
 
 ```bash
 npm ci                # instala as dependências de desenvolvimento
@@ -48,7 +48,7 @@ npm start             # sobe a API em http://localhost:3000
 
 Executa em todo `push` e `pull request` para `main` (e manualmente pela aba **Actions**):
 
-1. **app** (matriz Node 20 e 22): checkout → setup Node → `npm ci` → ESLint → Prettier → testes → build → publica o artefato `.tgz`.
+1. **app** (matriz Node 22 e 24): checkout → setup Node → `npm ci` → ESLint → Prettier → testes → build → publica o artefato `.tgz`.
 2. **infra**: checkout → setup Terraform → `terraform fmt -check` → `terraform init -backend=false` → `terraform validate`.
 
 Se qualquer etapa falhar, o pipeline fica vermelho e o merge na `main` deve ser bloqueado.

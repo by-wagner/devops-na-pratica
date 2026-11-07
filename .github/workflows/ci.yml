@@ -16,13 +16,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [20, 22]
+        node: [22, 24]
     steps:
       - name: Baixar o código
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Configurar Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node }}
           cache: npm
@@ -43,8 +43,8 @@ jobs:
         run: npm run build
 
       - name: Publicar artefato do build
-        if: matrix.node == 22
-        uses: actions/upload-artifact@v4
+        if: matrix.node == 24
+        uses: actions/upload-artifact@v7
         with:
           name: pacote-api
           path: dist/*.tgz
@@ -57,10 +57,10 @@ jobs:
         working-directory: infra
     steps:
       - name: Baixar o código
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Configurar Terraform
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@v4
 
       - name: Verificar formatação
         run: terraform fmt -check -recursive

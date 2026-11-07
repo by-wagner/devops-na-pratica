@@ -1,0 +1,20 @@
+{
+  "name": "devops-na-pratica",
+  "version": "1.0.0",
+  "description": "API REST de tarefas usada para praticar CI e IaC (PUCRS - DevOps na Prática, Fase 1)",
+  "type": "module",
+  "main": "src/server.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "start": "node src/server.js",
+    "lint": "node --check src/*.js test/*.js",
+    "test": "node --test",
+    "build": "mkdir -p dist && npm pack --pack-destination dist"
+  },
+  "license": "MIT"
+}

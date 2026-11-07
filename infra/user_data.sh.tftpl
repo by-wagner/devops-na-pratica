@@ -1,0 +1,25 @@
+#!/bin/bash
+# Executado uma vez na primeira inicialização da instância.
+set -euo pipefail
+
+dnf install -y nodejs git
+git clone ${repo_url} /opt/app
+
+cat > /etc/systemd/system/api.service <<EOF
+[Unit]
+Description=API devops-na-pratica
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/app
+Environment=PORT=${app_port}
+ExecStart=/usr/bin/node src/server.js
+Restart=always
+User=nobody
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl daemon-reload
+systemctl enable --now api

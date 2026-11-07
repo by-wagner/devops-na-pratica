@@ -1,6 +1,6 @@
 # DevOps na Prática — Fase 1: Configuração e Automação Inicial
 
-![CI](https://github.com/OWNER/devops-na-pratica/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/by-wagner/devops-na-pratica/actions/workflows/ci.yml/badge.svg)
 
 Projeto da disciplina **DevOps na Prática (PUCRS Online)**. Uma API REST simples de lista de tarefas serve de base
 para aplicar **Integração Contínua (CI)** com GitHub Actions e **Infraestrutura como Código (IaC)** com Terraform.
@@ -62,8 +62,8 @@ security group liberando apenas a porta da API, IAM role para acesso via SSM (se
 ```bash
 cd infra
 terraform init
-terraform plan  -var="repo_url=https://github.com/OWNER/devops-na-pratica.git"
-terraform apply -var="repo_url=https://github.com/OWNER/devops-na-pratica.git"
+terraform plan  -var="repo_url=https://github.com/by-wagner/devops-na-pratica.git"
+terraform apply -var="repo_url=https://github.com/by-wagner/devops-na-pratica.git"
 terraform destroy   # remove tudo para não gerar custo
 ```
 

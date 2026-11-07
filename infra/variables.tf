@@ -54,5 +54,5 @@ variable "allowed_cidr" {
 variable "repo_url" {
   description = "URL do repositório Git clonado pela instância na inicialização"
   type        = string
-  default     = "https://github.com/OWNER/devops-na-pratica.git"
+  default     = "https://github.com/by-wagner/devops-na-pratica.git"
 }

@@ -25,9 +25,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
+          cache: npm
 
-      - name: Lint (verificação de sintaxe)
+      - name: Instalar dependências (versões exatas do package-lock)
+        run: npm ci
+
+      - name: Lint (ESLint)
         run: npm run lint
+
+      - name: Formatação (Prettier)
+        run: npm run format:check
 
       - name: Testes automatizados
         run: npm test

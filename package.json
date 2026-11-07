@@ -12,9 +12,17 @@
   ],
   "scripts": {
     "start": "node src/server.js",
-    "lint": "node --check src/*.js test/*.js",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "test": "node --test",
     "build": "mkdir -p dist && npm pack --pack-destination dist"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "eslint": "^9.39.5",
+    "globals": "^17.14.0",
+    "prettier": "^3.9.10"
+  }
 }

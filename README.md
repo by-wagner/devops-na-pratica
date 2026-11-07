@@ -10,7 +10,7 @@ para aplicar **Integração Contínua (CI)** com GitHub Actions e **Infraestrutu
 ```
 .
 ├── .github/workflows/ci.yml   # pipeline de CI
-├── src/                       # código da API (Node.js, sem dependências externas)
+├── src/                       # código da API (Node.js, sem dependências de produção)
 │   ├── app.js                 # rotas e regras
 │   └── server.js              # ponto de entrada (lê PORT)
 ├── test/app.test.js           # testes automatizados (node:test)
@@ -25,28 +25,30 @@ para aplicar **Integração Contínua (CI)** com GitHub Actions e **Infraestrutu
 
 ## API
 
-| Método | Rota      | Descrição                         | Respostas     |
-|--------|-----------|-----------------------------------|---------------|
-| GET    | `/health` | Verificação de saúde              | 200           |
-| GET    | `/tasks`  | Lista as tarefas                  | 200           |
-| POST   | `/tasks`  | Cria tarefa `{"title": "..."}`    | 201, 400      |
+| Método | Rota      | Descrição                      | Respostas |
+| ------ | --------- | ------------------------------ | --------- |
+| GET    | `/health` | Verificação de saúde           | 200       |
+| GET    | `/tasks`  | Lista as tarefas               | 200       |
+| POST   | `/tasks`  | Cria tarefa `{"title": "..."}` | 201, 400  |
 
 ## Rodando localmente
 
 Requisito: Node.js 20 ou superior.
 
 ```bash
-npm run lint    # verificação de sintaxe
-npm test        # testes automatizados
-npm run build   # gera o pacote em dist/
-npm start       # sobe a API em http://localhost:3000
+npm ci                # instala as dependências de desenvolvimento
+npm run lint          # ESLint (erros e más práticas)
+npm run format:check  # Prettier (formatação)
+npm test              # testes automatizados
+npm run build         # gera o pacote em dist/
+npm start             # sobe a API em http://localhost:3000
 ```
 
 ## Pipeline de CI
 
 Executa em todo `push` e `pull request` para `main` (e manualmente pela aba **Actions**):
 
-1. **app** (matriz Node 20 e 22): checkout → setup Node → lint → testes → build → publica o artefato `.tgz`.
+1. **app** (matriz Node 20 e 22): checkout → setup Node → `npm ci` → ESLint → Prettier → testes → build → publica o artefato `.tgz`.
 2. **infra**: checkout → setup Terraform → `terraform fmt -check` → `terraform init -backend=false` → `terraform validate`.
 
 Se qualquer etapa falhar, o pipeline fica vermelho e o merge na `main` deve ser bloqueado.

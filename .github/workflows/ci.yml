@@ -112,8 +112,9 @@ jobs:
       - name: Baixar o código
         uses: actions/checkout@v7
 
+      # Sem atestação de proveniência: o metadado extra impede o "kind load" de carregar a imagem no nó.
       - name: Construir a imagem deste commit
-        run: docker build -t "$IMAGE" .
+        run: docker build --provenance=false --sbom=false -t "$IMAGE" .
 
       # kind = Kubernetes descartável rodando em containers dentro do próprio runner.
       - name: Criar cluster Kubernetes (kind) e carregar a imagem
@@ -121,6 +122,7 @@ jobs:
           kind version && kubectl version --client
           kind create cluster --name ci --wait 120s
           kind load docker-image "$IMAGE" --name ci
+          docker exec ci-control-plane crictl images | grep "${GITHUB_SHA}" # falha aqui se a imagem não entrou no nó
 
       - name: Deploy, rolling update, autocura e smoke test
         run: scripts/k8s-deploy.sh "$IMAGE"

@@ -24,6 +24,8 @@ spec:
       containers:
         - name: api
           image: ghcr.io/by-wagner/devops-na-pratica:latest
+          # Explícito: com a tag latest o padrão vira Always e o cluster ignoraria a imagem já carregada no nó.
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000
           readinessProbe: # só recebe tráfego depois que /health responder

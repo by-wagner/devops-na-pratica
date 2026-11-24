@@ -1,0 +1,11 @@
+# Endereço único da API dentro do cluster; distribui as requisições entre as réplicas prontas.
+apiVersion: v1
+kind: Service
+metadata:
+  name: api
+spec:
+  selector:
+    app: api
+  ports:
+    - port: 80
+      targetPort: 3000

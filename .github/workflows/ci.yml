@@ -102,9 +102,40 @@ jobs:
           docker push "$IMAGE:${{ github.sha }}"
           docker push "$IMAGE:latest"
 
+  kubernetes:
+    name: Orquestração (Kubernetes com kind)
+    needs: [app, infra]
+    runs-on: ubuntu-latest
+    env:
+      IMAGE: ghcr.io/${{ github.repository }}:${{ github.sha }}
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v7
+
+      - name: Construir a imagem deste commit
+        run: docker build -t "$IMAGE" .
+
+      # kind = Kubernetes descartável rodando em containers dentro do próprio runner.
+      - name: Criar cluster Kubernetes (kind) e carregar a imagem
+        run: |
+          kind version && kubectl version --client
+          kind create cluster --name ci --wait 120s
+          kind load docker-image "$IMAGE" --name ci
+          docker exec ci-control-plane crictl images | grep "${GITHUB_SHA}" # falha aqui se a imagem não entrou no nó
+
+      - name: Deploy, rolling update, autocura e smoke test
+        run: scripts/k8s-deploy.sh "$IMAGE"
+
+      - name: Diagnóstico do cluster (só em caso de falha)
+        if: failure()
+        run: |
+          kubectl get pods -l app=api -o wide
+          kubectl describe pods -l app=api | tail -n 60
+          kubectl get events --sort-by=.lastTimestamp | tail -n 30
+
   deploy:
     name: Deploy na AWS (EC2 via SSM)
-    needs: image
+    needs: [image, kubernetes] # só vai para produção se a orquestração também passou
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: aws-academy

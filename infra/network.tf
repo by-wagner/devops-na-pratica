@@ -17,6 +17,7 @@ resource "aws_subnet" "public" {
   vpc_id                  = aws_vpc.main.id
   cidr_block              = var.public_subnet_cidr
   map_public_ip_on_launch = true
+  availability_zone       = "${var.aws_region}a" # fixa a zona: nem toda zona oferece t3.micro (ex.: us-east-1e)
 
   tags = { Name = "${var.project_name}-public-subnet" }
 }

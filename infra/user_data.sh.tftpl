@@ -1,25 +1,10 @@
 #!/bin/bash
-# Executado uma vez na primeira inicialização da instância.
+# Executado uma vez na primeira inicialização da instância: instala o Docker e sobe a API em container.
 set -euo pipefail
 
-dnf install -y nodejs git
-git clone ${repo_url} /opt/app
+dnf install -y docker
+systemctl enable --now docker
 
-cat > /etc/systemd/system/api.service <<EOF
-[Unit]
-Description=API devops-na-pratica
-After=network.target
-
-[Service]
-WorkingDirectory=/opt/app
-Environment=PORT=${app_port}
-ExecStart=/usr/bin/node src/server.js
-Restart=always
-User=nobody
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-systemctl daemon-reload
-systemctl enable --now api
+docker run -d --name api --restart unless-stopped \
+  -p ${app_port}:3000 \
+  ${image}

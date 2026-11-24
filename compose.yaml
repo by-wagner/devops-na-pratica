@@ -1,0 +1,9 @@
+# Sobe a API em container: `docker compose up -d --build` (local) ou com a imagem publicada (deploy).
+services:
+  api:
+    image: ${API_IMAGE:-devops-na-pratica:local}
+    build: .
+    ports:
+      - '${API_PORT:-3000}:3000'
+    restart: unless-stopped
+    init: true # repassa o sinal de parada ao Node, para o container parar na hora

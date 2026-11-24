@@ -70,3 +70,34 @@ jobs:
 
       - name: Validar configuração
         run: terraform validate
+
+  image:
+    name: Imagem Docker (build, smoke test e publicação no GHCR)
+    needs: [app, infra]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write # publicar a imagem no GitHub Container Registry
+    env:
+      IMAGE: ghcr.io/${{ github.repository }}
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v7
+
+      - name: Construir a imagem
+        run: docker build -t "$IMAGE:${{ github.sha }}" .
+
+      - name: Smoke test do container (/health deve responder 200)
+        run: |
+          docker run -d --name api -p 3000:3000 "$IMAGE:${{ github.sha }}"
+          for i in $(seq 1 15); do curl -fsS localhost:3000/health && exit 0; sleep 1; done
+          docker logs api; exit 1
+
+      # Só a main publica: PRs validam a imagem, mas não geram versão.
+      - name: Publicar no GHCR (tags com o SHA do commit e latest)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          docker tag "$IMAGE:${{ github.sha }}" "$IMAGE:latest"
+          docker push "$IMAGE:${{ github.sha }}"
+          docker push "$IMAGE:latest"

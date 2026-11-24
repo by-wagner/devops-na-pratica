@@ -1,0 +1,4 @@
+# Só package.json e src/ entram na imagem; o resto fica de fora para ela ser pequena e não vazar arquivos locais.
+*
+!package.json
+!src/

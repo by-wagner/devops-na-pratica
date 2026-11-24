@@ -51,8 +51,15 @@ variable "allowed_cidr" {
   default     = "0.0.0.0/0"
 }
 
-variable "repo_url" {
-  description = "URL do repositório Git clonado pela instância na inicialização"
+variable "image" {
+  description = "Imagem Docker da API, publicada no GitHub Container Registry pelo pipeline"
   type        = string
-  default     = "https://github.com/by-wagner/devops-na-pratica.git"
+  default     = "ghcr.io/by-wagner/devops-na-pratica:latest"
+}
+
+# O AWS Academy Learner Lab não permite criar IAM roles; usa o perfil pronto do laboratório.
+variable "instance_profile" {
+  description = "Instance profile (IAM) associado à EC2"
+  type        = string
+  default     = "LabInstanceProfile"
 }

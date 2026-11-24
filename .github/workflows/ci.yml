@@ -125,6 +125,13 @@ jobs:
       - name: Deploy, rolling update, autocura e smoke test
         run: scripts/k8s-deploy.sh "$IMAGE"
 
+      - name: Diagnóstico do cluster (só em caso de falha)
+        if: failure()
+        run: |
+          kubectl get pods -l app=api -o wide
+          kubectl describe pods -l app=api | tail -n 60
+          kubectl get events --sort-by=.lastTimestamp | tail -n 30
+
   deploy:
     name: Deploy na AWS (EC2 via SSM)
     needs: [image, kubernetes] # só vai para produção se a orquestração também passou

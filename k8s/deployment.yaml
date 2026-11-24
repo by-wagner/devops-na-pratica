@@ -1,0 +1,51 @@
+# Orquestração da API no Kubernetes: 2 réplicas, troca de versão sem derrubar (rolling update)
+# e probes no /health para o cluster saber quando cada container está pronto e vivo.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  labels:
+    app: api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: api
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0 # nunca fica com menos réplicas prontas durante a troca de versão
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+        - name: api
+          image: ghcr.io/by-wagner/devops-na-pratica:latest
+          ports:
+            - containerPort: 3000
+          readinessProbe: # só recebe tráfego depois que /health responder
+            httpGet:
+              path: /health
+              port: 3000
+            periodSeconds: 5
+          livenessProbe: # reinicia o container se /health parar de responder
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 250m
+              memory: 128Mi
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000 # usuário "node" da imagem
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true

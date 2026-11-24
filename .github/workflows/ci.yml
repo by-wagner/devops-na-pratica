@@ -95,9 +95,28 @@ jobs:
 
       # Só a main publica: PRs validam a imagem, mas não geram versão.
       - name: Publicar no GHCR (tags com o SHA do commit e latest)
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
           docker tag "$IMAGE:${{ github.sha }}" "$IMAGE:latest"
           docker push "$IMAGE:${{ github.sha }}"
           docker push "$IMAGE:latest"
+
+  deploy:
+    name: Deploy na AWS (EC2 via SSM)
+    needs: image
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: aws-academy
+    # Credenciais temporárias do AWS Academy Learner Lab: expiram a cada sessão e são atualizadas nos secrets.
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+      AWS_DEFAULT_REGION: us-east-1
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v7
+
+      - name: Deploy da imagem deste commit e smoke test
+        run: scripts/deploy.sh "ghcr.io/${{ github.repository }}:${{ github.sha }}"
